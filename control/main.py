@@ -33,67 +33,82 @@ class MainWindow(QtGui.QMainWindow, Ui_MainWindow):
         # 增加 widget
         self.wgt = QtGui.QWidget(self)
         self.setCentralWidget(self.wgt)
-        
+
         # 设置背景颜色
         color = QtGui.QColor(0, 0, 0)
         self.wgt.setStyleSheet("QWidget{background-color: %s}" % color.name())
-        
+
         # 添加最大化，最小化，关闭按钮
-        self.min_btn = QtGui.QPushButton(u"最小化",self)
-        self.min_btn.setStyleSheet("QWidget{background-color: #FF0000}")
+        self.min_btn = QtGui.QPushButton(self)
+        icon = QtGui.QIcon("./resource/button/min_32x32.png")
+        self.min_btn.setIcon(icon)
+        self.min_btn.setStyleSheet("QWidget{background-color: #FFFFFF}")
         self.min_btn.clicked.connect(self.showMinimized)
-        
-        self.max_btn = QtGui.QPushButton(u"最大化",self)
-        self.max_btn.setStyleSheet("QWidget{background-color: #00FF00}")
+
+        self.max_btn = QtGui.QPushButton(self)
+        icon = QtGui.QIcon("./resource/button/max_32x32.png")
+        self.max_btn.setIcon(icon)
+        self.max_btn.setStyleSheet("QWidget{background-color: #FFFFFF}")
         self.max_btn.clicked.connect(self.change_size)
-        
-        self.close_btn = QtGui.QPushButton(u"关闭",self)
-        self.close_btn.setStyleSheet("QWidget{background-color: #0000FF}")
+
+        self.close_btn = QtGui.QPushButton(self)
+        icon = QtGui.QIcon("./resource/button/close_32x32.png")
+        self.close_btn.setIcon(icon)
+        self.close_btn.setStyleSheet("QWidget{background-color: #FFFFFF}")
         self.close_btn.clicked.connect(self.close)
         self.close_btn.setObjectName('test')
-        
+
         # 增加布局
-        hbox1 = QtGui.QHBoxLayout()   #水平布局
+        hbox1 = QtGui.QHBoxLayout()  # 水平布局
         hbox1.addStretch()
-        hbox1.addWidget(self.min_btn, alignment=Qt.AlignRight)
-        hbox1.addWidget(self.max_btn, alignment=Qt.AlignRight)
-        hbox1.addWidget(self.close_btn, alignment=Qt.AlignRight)
-        
-        vbox = QtGui.QVBoxLayout()   #垂直布局
+        hbox1.setAlignment(Qt.AlignRight)
+        hbox1.setSpacing(0)
+        hbox1.addWidget(self.min_btn)
+        hbox1.addWidget(self.max_btn)
+        hbox1.addWidget(self.close_btn)
+
+        vbox = QtGui.QVBoxLayout()  # 垂直布局
         vbox.addLayout(hbox1)
         vbox.addStretch()
         self.wgt.setLayout(vbox)
-        self.is_max_size = False
+
+        # 窗口居中
+        self.center()
+
+        self.is_drag = False
         self.default_size = self.size()
-        
-#     def change_size(self):
-#         print self.is_max_size
-#         if self.is_max_size:
-#             self.resize(self.default_size)
-#             self.is_max_size = False
-#         else:
-#             self.is_max_size = True
-#             self.showMaximized()
-#         print "changed", self.is_max_size
-        
+
+    def change_size(self):
+        if self.isFullScreen():
+            self.resize(self.default_size)
+            self.center()
+        else:
+            self.showFullScreen()
+
+    def center(self):
+        center = QtGui.QDesktopWidget().availableGeometry().center()
+        geometry = self.frameGeometry()
+        geometry.moveCenter(center)
+        self.move(geometry.topLeft())
+
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self.is_drag = True
             self.target_pos = event.globalPos() - self.pos()
             event.accept()
             self.setCursor(QtGui.QCursor(Qt.OpenHandCursor))
-            
+
     def mouseMoveEvent(self, QMouseEvent):
         if Qt.LeftButton and self.is_drag:
             self.move(QMouseEvent.globalPos() - self.target_pos)
             QMouseEvent.accept()
-            
+
     def mouseReleaseEvent(self, QMouseEvent):
         self.is_drag = False
         self.setCursor(QtGui.QCursor(Qt.ArrowCursor))
 
     def bind(self):
         pass
-    
-    
-    
+
+
+
